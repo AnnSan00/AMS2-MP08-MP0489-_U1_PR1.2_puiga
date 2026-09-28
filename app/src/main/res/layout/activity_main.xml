@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
-    tools:context=".MainActivity">
+    android:padding="16dp">
 
-    <!-- Comptador d'intents a la cantonada superior -->
+    <!-- Contador de intentos -->
     <TextView
         android:id="@+id/tvAttempts"
         android:layout_width="wrap_content"
@@ -19,48 +16,49 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Casella d'entrada només per a números -->
+    <!-- Campo de texto para ingresar números -->
     <EditText
         android:id="@+id/etNumber"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Escriu un número (1-100)"
-        android:inputType="number"
-        android:imeOptions="actionDone"
         android:layout_marginTop="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:hint="Introdueix un número (1-100)"
+        android:imeOptions="actionDone"
+        android:inputType="number"
+        app:layout_constraintEnd_toStartOf="@id/btnGuess"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvAttempts" />
 
-    <!-- Botó per validar -->
+    <!-- Botón para probar suerte -->
     <Button
         android:id="@+id/btnGuess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Adivina!"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Provar"
+        app:layout_constraintBottom_toBottomOf="@id/etNumber"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etNumber" />
+        app:layout_constraintStart_toEndOf="@id/etNumber"
+        app:layout_constraintTop_toTopOf="@id/etNumber" />
 
-    <!-- ScrollView per a l'historial  -->
+    <!-- ScrollView para el historial de intentos -->
     <ScrollView
         android:id="@+id/scrollView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:background="#F5F5F5"
+        android:background="#10000000"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnGuess">
+        app:layout_constraintTop_toBottomOf="@id/etNumber">
 
         <TextView
             android:id="@+id/tvHistory"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp" />
+            android:textSize="14sp" />
     </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
