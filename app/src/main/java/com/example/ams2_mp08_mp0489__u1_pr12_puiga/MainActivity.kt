@@ -2,7 +2,6 @@ package com.example.ams2_mp08_mp0489__u1_pr12_puiga
 
 import android.os.Bundle
 import android.util.Log
-import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
@@ -15,42 +14,56 @@ import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
-    // Vistas del layout principal (activity_main.xml)
+    companion object {
+        private const val TAG = "JOC_LOG"
+        private const val KEY_SECRET_NUMBER = "secret_number"
+        private const val KEY_ATTEMPTS = "attempts"
+        private const val KEY_HISTORY = "history"
+    }
+
+    private var secretNumber: Int = 0
+    private var attemptsCount: Int = 0
+
     private lateinit var etNumber: EditText
     private lateinit var btnGuess: Button
     private lateinit var tvAttempts: TextView
     private lateinit var tvHistory: TextView
+    private lateinit var tvDebugNumber: TextView
     private lateinit var scrollView: ScrollView
-
-    private var secretNumber = 0
-    private var attemptsCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Referencias del layout principal
+        // Inicialització de les vistes
         etNumber = findViewById(R.id.etNumber)
         btnGuess = findViewById(R.id.btnGuess)
         tvAttempts = findViewById(R.id.tvAttempts)
         tvHistory = findViewById(R.id.tvHistory)
+        tvDebugNumber = findViewById(R.id.tvDebugNumber)
         scrollView = findViewById(R.id.scrollView)
 
-        // Inicializamos la primera partida
-        startNewGame()
-
-        // Evento al pulsar el botón
-        btnGuess.setOnClickListener {
-            processGuess()
+        // Restaurar l'estat si s'ha girat la pantalla o iniciar un nou joc
+        if (savedInstanceState != null) {
+            secretNumber = savedInstanceState.getInt(KEY_SECRET_NUMBER)
+            attemptsCount = savedInstanceState.getInt(KEY_ATTEMPTS)
+            tvHistory.text = savedInstanceState.getString(KEY_HISTORY, "")
+            Log.i(TAG, "Estat restaurat. Número secret mantingut: $secretNumber")
+        } else {
+            startNewGame()
         }
 
-        // Evento para detectar la tecla Enter / Hecho del teclado virtual
-        etNumber.setOnEditorActionListener { _, actionId, event ->
-            if (actionId == EditorInfo.IME_ACTION_DONE ||
-                (event != null && event.keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN)
-            ) {
-                processGuess()
-                etNumber.requestFocus() // Mantenemos el foco en el campo de texto
+        updateUI()
+
+        // Listener del botó
+        btnGuess.setOnClickListener {
+            checkAttempt()
+        }
+
+        // Listener per a la tecla ENTER del teclat de pantalla
+        etNumber.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE || actionId == EditorInfo.IME_NULL) {
+                checkAttempt()
                 true
             } else {
                 false
@@ -58,99 +71,94 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    // Inicializa o reinicia la partida
-    private fun startNewGame() {
-        secretNumber = Random.nextInt(1, 101) // Número aleatorio entre 1 y 100
-        attemptsCount = 0
-
-        tvAttempts.text = "Intents: 0"
-        tvHistory.text = ""
-        etNumber.setText("")
-
-        // Chivato en Logcat
-        Log.i(TAG, "Nova partida iniciada. Número secret: $secretNumber")
+    // Guarda l'estat del joc abans de destrossar l'Activity pel gir de pantalla
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_SECRET_NUMBER, secretNumber)
+        outState.putInt(KEY_ATTEMPTS, attemptsCount)
+        outState.putString(KEY_HISTORY, tvHistory.text.toString())
+        Log.i(TAG, "Guardant estat del joc abans del gir de pantalla.")
     }
 
-    // Lógica principal del intento
-    private fun processGuess() {
-        val input = etNumber.text.toString().trim()
+    private fun startNewGame() {
+        secretNumber = Random.nextInt(1, 101) // Número aleatori entre 1 i 100
+        attemptsCount = 0
+        tvHistory.text = ""
+        Log.i(TAG, "Nova partida iniciada. El número pensat és: $secretNumber")
+        updateUI()
+    }
 
-        if (input.isEmpty()) {
+    private fun updateUI() {
+        tvAttempts.text = "Intents: $attemptsCount"
+        tvDebugNumber.text = "[PROVES] Número secret: $secretNumber"
+    }
+
+    private fun checkAttempt() {
+        val inputStr = etNumber.text.toString().trim()
+
+        if (inputStr.isEmpty()) {
             Toast.makeText(this, "Introdueix un número vàlid!", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val userNumber = input.toInt()
+        val userNumber = inputStr.toInt()
         attemptsCount++
+        Log.i(TAG, "Intent $attemptsCount: El número introduït és $userNumber")
 
-        Log.i(TAG, "Tentativa $attemptsCount: L'usuari ha entrat $userNumber")
+        val resultText: String
 
-        // Actualizamos el contador de intentos
-        tvAttempts.text = "Intents: $attemptsCount"
-
-        when {
-            userNumber == secretNumber -> {
-                Toast.makeText(this, "Felicitats! Has encertat!", Toast.LENGTH_SHORT).show()
-                showWinDialog()
-            }
-            userNumber < secretNumber -> {
-                Toast.makeText(this, "El número buscat és MÉS GRAN", Toast.LENGTH_SHORT).show()
-                appendHistory("Intent $attemptsCount: $userNumber -> El número és MÉS GRAN")
-            }
-            else -> {
-                Toast.makeText(this, "El número buscat és MÉS PETIT", Toast.LENGTH_SHORT).show()
-                appendHistory("Intent $attemptsCount: $userNumber -> El número és MÉS PETIT")
-            }
+        if (userNumber < secretNumber) {
+            resultText = "Intent $attemptsCount: $userNumber -> El número buscat és MÉS GRAN.\n"
+            Toast.makeText(this, "El número que busques és MÉS GRAN", Toast.LENGTH_SHORT).show()
+        } else if (userNumber > secretNumber) {
+            resultText = "Intent $attemptsCount: $userNumber -> El número buscat és MÉS PETIT.\n"
+            Toast.makeText(this, "El número que busques és MÉS PETIT", Toast.LENGTH_SHORT).show()
+        } else {
+            resultText = "Intent $attemptsCount: $userNumber -> ENCERTAT! 🎉\n"
+            Log.i(TAG, "Partida finalitzada! Encertat en $attemptsCount intents.")
+            showWinDialog()
         }
 
-        // Borramos el texto para el siguiente intento
+        // Afegir a l'historial i netejar el camp de text
+        tvHistory.append(resultText)
         etNumber.setText("")
-    }
+        etNumber.requestFocus() // Mantenir el focus al camp de text
+        updateUI()
 
-    // Añade texto al historial y desplaza el ScrollView al final
-    private fun appendHistory(text: String) {
-        tvHistory.append("$text\n")
+        // Desplaçament automàtic cap al final del ScrollView
         scrollView.post {
             scrollView.fullScroll(ScrollView.FOCUS_DOWN)
         }
     }
 
-    // Muestra el AlertDialog inflando el layout personalizado dialog_win.xml
+    // Mostra la finestra emergent personalitzada quan l'usuari guanya
     private fun showWinDialog() {
-        // 1. Inflamos el layout emergente
-        val inflater = layoutInflater
-        val dialogView = inflater.inflate(R.layout.dialog_win, null)
-
-        // 2. Referenciamos los elementos dentro de dialog_win.xml
-        val tvWinMessage = dialogView.findViewById<TextView>(R.id.tvWinMessage)
-        val etPlayerName = dialogView.findViewById<EditText>(R.id.etPlayerName)
-
-        // 3. Personalizamos el texto con los intentos
-        tvWinMessage.text = "Has endevinat el número en $attemptsCount intents.\nIntrodueix el teu nom per al rècord:"
-
-        // 4. Construimos el AlertDialog
         val builder = AlertDialog.Builder(this)
-        builder.setTitle("Partida Finalitzada!")
+        val dialogView = layoutInflater.inflate(R.layout.dialog_win, null)
         builder.setView(dialogView)
 
-        builder.setPositiveButton("Guardar") { _, _ ->
-            var name = etPlayerName.text.toString().trim()
-            if (name.isEmpty()) name = "Anònim"
+        val tvDialogMessage = dialogView.findViewById<TextView>(R.id.tvDialogMessage)
+        val etPlayerName = dialogView.findViewById<EditText>(R.id.etPlayerName)
 
-            Log.i(TAG, "Rècord registrat: $name amb $attemptsCount intents.")
+        tvDialogMessage.text = "Has endevinat el número secret ($secretNumber) en $attemptsCount intents."
+
+        builder.setPositiveButton("Guardar Rècord") { _, _ ->
+            var playerName = etPlayerName.text.toString().trim()
+            if (playerName.isEmpty()) {
+                playerName = "Anònim"
+            }
+            Log.i(TAG, "Rècord registrat: $playerName - $attemptsCount intents.")
+            Toast.makeText(this, "Rècord guardat per a $playerName", Toast.LENGTH_SHORT).show()
             startNewGame()
         }
 
-        builder.setNegativeButton("Ometre") { _, _ ->
-            Log.i(TAG, "L'usuari ha omès registrar el nom.")
+        builder.setNegativeButton("Desestimar") { _, _ ->
+            Log.i(TAG, "L'usuari ha desestimat guardar el nom.")
             startNewGame()
         }
 
         builder.setCancelable(false)
-        builder.show()
-    }
-
-    companion object {
-                    private const val TAG = "JOC_LOG"
+        val dialog = builder.create()
+        dialog.show()
     }
 }

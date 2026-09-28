@@ -1,58 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- Contador de intentos -->
+    <!-- Secció de Proves: Mostra el número secret -->
     <TextView
-        android:id="@+id/tvAttempts"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvDebugNumber"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Intents: 0"
-        android:textSize="18sp"
+        android:text="[PROVES] Número secret: --"
+        android:textColor="#D32F2F"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:paddingBottom="8dp" />
 
-    <!-- Campo de texto para ingresar números -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvAttempts"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Intents: 0"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
     <EditText
         android:id="@+id/etNumber"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:hint="Introdueix un número (1-100)"
-        android:imeOptions="actionDone"
         android:inputType="number"
-        app:layout_constraintEnd_toStartOf="@id/btnGuess"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvAttempts" />
+        android:imeOptions="actionDone"
+        android:layout_marginTop="12dp" />
 
-    <!-- Botón para probar suerte -->
     <Button
         android:id="@+id/btnGuess"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Validar número"
+        android:layout_marginTop="8dp" />
+
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Provar"
-        app:layout_constraintBottom_toBottomOf="@id/etNumber"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/etNumber"
-        app:layout_constraintTop_toTopOf="@id/etNumber" />
+        android:text="Historial:"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp" />
 
-    <!-- ScrollView para el historial de intentos -->
+    <!-- ScrollView per a l'historial d'intents -->
     <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:background="#10000000"
+        android:layout_weight="1"
+        android:background="#F0F0F0"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/etNumber">
+        android:layout_marginTop="4dp">
 
         <TextView
             android:id="@+id/tvHistory"
@@ -61,4 +70,4 @@
             android:textSize="14sp" />
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

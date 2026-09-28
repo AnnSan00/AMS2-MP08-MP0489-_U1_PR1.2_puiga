@@ -5,22 +5,29 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <!-- Mensaje dinámico de victoria -->
     <TextView
-        android:id="@+id/tvWinMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Has endevinat el número! Introdueix el teu nom per al rècord:"
-        android:textSize="16sp"
-        android:layout_marginBottom="12dp" />
+        android:text="Enhorabona! Has encertat!"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="#2E7D32" />
 
-    <!-- Campo para ingresar el nombre -->
+    <TextView
+        android:id="@+id/tvDialogMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Has estat capaç d'endevinar el número."
+        android:layout_marginTop="10dp"
+        android:gravity="center" />
+
     <EditText
         android:id="@+id/etPlayerName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="El teu nom"
-        android:inputType="textCapWords"
-        android:maxLines="1" />
+        android:hint="Escriu el teu nom (Opcional)"
+        android:inputType="textPersonName"
+        android:layout_marginTop="15dp" />
 
 </LinearLayout>
